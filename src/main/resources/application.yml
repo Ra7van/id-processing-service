@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  ai:
+    azure:
+      openai:
+        api-key: ${AZURE_OPENAI_API_KEY}
+        endpoint: ${AZURE_OPENAI_ENDPOINT}
+        chat:
+          options:
+            deployment-name: gpt-4o
+            temperature: 0.7
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+app:
+  identity-card:
+    allow-invalid-cnp: false

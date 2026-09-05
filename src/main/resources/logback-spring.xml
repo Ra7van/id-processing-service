@@ -1,0 +1,77 @@
+<configuration>
+
+    <springProperty name="service" scope="context" source="spring.application.name"/>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+    <springProfile name="!classicLogging">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <timestamp/>
+                    <logLevel>
+                        <fieldName>loglevel</fieldName>
+                    </logLevel>
+                    <loggerName>
+                        <fieldName>logger</fieldName>
+                    </loggerName>
+                    <threadName>
+                        <fieldName>thread</fieldName>
+                    </threadName>
+                    <context/>
+                    <message/>
+                    <logstashMarkers/>
+                    <pattern>
+                        <omitEmptyFields>true</omitEmptyFields>
+                        <pattern>
+                            {
+                            "traceId": "%X{traceId:-}",
+                            "span_id": "%X{spanId:-}",
+                            "parent_span_id": "%X{parentSpanId:-}",
+                            "username": "%X{username:-}"
+                            }
+                        </pattern>
+                    </pattern>
+                    <stackTrace>
+                        <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                            <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                            <maxLength>2048</maxLength>
+                            <shortenedClassNameLength>20</shortenedClassNameLength>
+                            <exclude>^sun\.reflect\..*\.invoke</exclude>
+                            <exclude>^net\.sf\.cglib\.proxy\.MethodProxy\.invoke</exclude>
+                            <rootCauseFirst>true</rootCauseFirst>
+                        </throwableConverter>
+                    </stackTrace>
+                </providers>
+            </encoder>
+        </appender>
+    </springProfile>
+
+    <springProfile name="classicLogging">
+        <property name="CONSOLE_LOG_PATTERN"
+                  value="%d{yyyy-MM-dd HH:mm:ss.SSS} DEFAULT [%thread] %-5level %logger{36} - %msg%n"/>
+
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    </springProfile>
+
+    <springProfile name="!live">
+        <logger name="id_ocr" level="DEBUG"/>
+
+        <root level="WARN">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="live">
+        <logger name="id_ocr" level="INFO"/>
+
+        <root level="WARN">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+</configuration>
